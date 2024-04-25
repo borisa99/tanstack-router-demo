@@ -11,6 +11,7 @@ const ProductCard: FC<ProductType> = ({ id, title, image }) => {
       params={{
         productId: id,
       }}
+      search={{ q: "" }}
     >
       <div className="overflow-hidden">
         <div className="group flex flex-col space-y-3 hover:opacity-70">

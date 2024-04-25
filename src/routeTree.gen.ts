@@ -13,8 +13,9 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
+import { Route as LayoutProductsImport } from './routes/_layout/products'
 import { Route as LayoutProductsIndexImport } from './routes/_layout/products.index'
-import { Route as LayoutProductsProductIdImport } from './routes/_layout/products.$productId'
+import { Route as LayoutProductProductIdImport } from './routes/_layout/product.$productId'
 import { Route as LayoutProductsProductIdModalImport } from './routes/_layout/products._.$productId.modal'
 
 // Create/Update Routes
@@ -29,20 +30,25 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const LayoutProductsIndexRoute = LayoutProductsIndexImport.update({
-  path: '/products/',
+const LayoutProductsRoute = LayoutProductsImport.update({
+  path: '/products',
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutProductsProductIdRoute = LayoutProductsProductIdImport.update({
-  path: '/products/$productId',
+const LayoutProductsIndexRoute = LayoutProductsIndexImport.update({
+  path: '/',
+  getParentRoute: () => LayoutProductsRoute,
+} as any)
+
+const LayoutProductProductIdRoute = LayoutProductProductIdImport.update({
+  path: '/product/$productId',
   getParentRoute: () => LayoutRoute,
 } as any)
 
 const LayoutProductsProductIdModalRoute =
   LayoutProductsProductIdModalImport.update({
-    path: '/products/$productId/modal',
-    getParentRoute: () => LayoutRoute,
+    path: '/$productId/modal',
+    getParentRoute: () => LayoutProductsRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -57,17 +63,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_layout/products/$productId': {
-      preLoaderRoute: typeof LayoutProductsProductIdImport
+    '/_layout/products': {
+      preLoaderRoute: typeof LayoutProductsImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/product/$productId': {
+      preLoaderRoute: typeof LayoutProductProductIdImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/products/': {
       preLoaderRoute: typeof LayoutProductsIndexImport
-      parentRoute: typeof LayoutImport
+      parentRoute: typeof LayoutProductsImport
     }
     '/_layout/products//$productId/modal': {
       preLoaderRoute: typeof LayoutProductsProductIdModalImport
-      parentRoute: typeof LayoutImport
+      parentRoute: typeof LayoutProductsImport
     }
   }
 }
@@ -77,9 +87,11 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
   LayoutRoute.addChildren([
-    LayoutProductsProductIdRoute,
-    LayoutProductsIndexRoute,
-    LayoutProductsProductIdModalRoute,
+    LayoutProductsRoute.addChildren([
+      LayoutProductsIndexRoute,
+      LayoutProductsProductIdModalRoute,
+    ]),
+    LayoutProductProductIdRoute,
   ]),
 ])
 

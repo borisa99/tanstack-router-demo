@@ -4,8 +4,9 @@ import {
   createFileRoute,
   defer,
   useNavigate,
+  useRouterState,
 } from "@tanstack/react-router";
-import { ArrowBigLeftDashIcon } from "lucide-react";
+import { ArrowBigLeftDashIcon, CheckCircle2Icon, Copy } from "lucide-react";
 
 import { fetchProduct } from "@/data/products";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SkeletonCard } from "@/components/skeleton-card";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 export const Route = createFileRoute("/_layout/products//$productId/modal")({
   loader: async ({ params: { productId } }) => {
@@ -30,6 +32,10 @@ export const Route = createFileRoute("/_layout/products//$productId/modal")({
 
 function ProductComponent() {
   const { product } = Route.useLoaderData();
+  const router = useRouterState();
+
+  const [linkCopied, setLinkCopied] = useState(false);
+
   const navigate = useNavigate();
 
   return (
@@ -45,14 +51,39 @@ function ProductComponent() {
         <Suspense fallback={<SkeletonCard />}>
           <Await promise={product}>
             {({ image, title, description }) => (
-              <DialogHeader>
-                <div
-                  className="mb-5 h-[300px] w-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${image})` }}
-                ></div>
-                <DialogTitle className="mb-3">{title}</DialogTitle>
-                <DialogDescription>{description}</DialogDescription>
-              </DialogHeader>
+              <>
+                <DialogHeader className="mb-10">
+                  <div
+                    className="mb-5 h-[300px] w-full bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: `url(${image})` }}
+                  ></div>
+                  <DialogTitle className="mb-3">{title}</DialogTitle>
+                  <DialogDescription>{description}</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    className="w-full gap-x-3"
+                    size="sm"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${import.meta.env.VITE_APP_URL}${router.location.maskedLocation?.pathname}`,
+                      );
+                      setLinkCopied(true);
+                    }}
+                  >
+                    {linkCopied ? (
+                      <>
+                        <CheckCircle2Icon /> Link copied to clipboard
+                      </>
+                    ) : (
+                      <>
+                        <Copy />
+                        Share with friends (copy link to clipboard)
+                      </>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </>
             )}
           </Await>
         </Suspense>

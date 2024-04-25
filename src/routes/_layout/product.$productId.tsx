@@ -4,7 +4,7 @@ import { ArrowBigLeftDashIcon } from "lucide-react";
 import { fetchProduct } from "@/data/products";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/_layout/products/$productId")({
+export const Route = createFileRoute("/_layout/product/$productId")({
   loader: async ({ params: { productId } }) => await fetchProduct(productId),
   errorComponent: ProductErrorComponent,
   component: ProductComponent,
